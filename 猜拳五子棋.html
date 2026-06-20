@@ -1,0 +1,624 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>猜拳五子棋</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%233a2a1a'/%3E%3Cstop offset='100%25' stop-color='%231a0a00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23bg)'/%3E%3Cg stroke='%23a09070' stroke-width='1.2' opacity='0.55'%3E%3Cline x1='9' y1='22' x2='55' y2='22'/%3E%3Cline x1='9' y1='32' x2='55' y2='32'/%3E%3Cline x1='9' y1='42' x2='55' y2='42'/%3E%3Cline x1='22' y1='9' x2='22' y2='55'/%3E%3Cline x1='32' y1='9' x2='32' y2='55'/%3E%3Cline x1='42' y1='9' x2='42' y2='55'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='12' fill='%231a1a1a' stroke='%23444' stroke-width='1.8'/%3E%3Ccircle cx='32' cy='32' r='10' fill='none' stroke='%23faf6ed' stroke-width='0.6' opacity='0.3'/%3E%3Cpath d='M24 36 Q22 28 26 22 Q30 16 35 18 Q42 19 44 26 Q46 32 43 38 Q38 44 31 44 Q24 43 22 38 Q18 32 24 36 Z' fill='%23666' stroke='%23444' stroke-width='0.8'/%3E%3Cpath d='M25 35 Q24 30 27 25 Q31 21 35 23 Q40 24 41 30 Q42 34 39 38 Q35 42 30 41 Q24 40 23 36 Z' fill='%23f5f0e6' opacity='0.25'/%3E%3Cpath d='M28 33 Q29 29 32 28 Q34 33 32 33' fill='none' stroke='%23f5f0e6' stroke-width='0.4' opacity='0.35'/%3E%3C/svg%3E">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: "Microsoft YaHei","PingFang SC","KaiTi",sans-serif;
+    background: #f5f0e6;
+    background-image:
+        radial-gradient(ellipse at 20% 80%,rgba(80,60,40,0.06) 0%,transparent 60%),
+        radial-gradient(ellipse at 80% 20%,rgba(60,50,40,0.04) 0%,transparent 60%),
+        radial-gradient(ellipse at 50% 50%,rgba(100,80,60,0.03) 0%,transparent 70%);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #3a2a1a; user-select: none;
+}
+body::before {
+    content: ""; position: fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:
+        repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.008) 2px,rgba(0,0,0,0.008) 3px),
+        repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,0.005) 3px,rgba(0,0,0,0.005) 4px);
+    pointer-events: none; z-index: 0;
+}
+.seal-stamp {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 54px; height: 54px;
+    border: 2.5px solid #c04030; border-radius: 3px;
+    color: #c04030; font-size: 0.85rem; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; line-height: 1.3;
+    transform: rotate(-7deg); opacity: 0.45; z-index: 10;
+    pointer-events: none; user-select: none;
+}
+.bamboo-left, .bamboo-right {
+    position: fixed; top: 5%; bottom: 5%;
+    width: 50px; z-index: 0; pointer-events: none;
+}
+.bamboo-left { left: 12px; }
+.bamboo-right { right: 12px; }
+.bamboo-left::before {
+    content: ""; position: absolute; left: 2px; top: 5%;
+    width: 7px; height: 52%;
+    background: linear-gradient(90deg,rgba(50,90,50,0.08),rgba(70,130,70,0.14),rgba(50,90,50,0.08));
+    border-radius: 3px;
+    box-shadow: 0 8% 0 -3px rgba(40,70,40,0.06),0 22% 0 -3px rgba(40,70,40,0.07),0 38% 0 -3px rgba(40,70,40,0.06),0 56% 0 -3px rgba(40,70,40,0.07),0 74% 0 -3px rgba(40,70,40,0.05),0 90% 0 -3px rgba(40,70,40,0.06);
+}
+.bamboo-left::after {
+    content: ""; position: absolute; left: 18px; top: 18%;
+    width: 5px; height: 38%;
+    background: linear-gradient(90deg,rgba(60,100,60,0.06),rgba(80,140,80,0.10),rgba(60,100,60,0.06));
+    border-radius: 2px;
+    box-shadow: 0 12% 0 -2.5px rgba(40,70,40,0.05),0 28% 0 -2.5px rgba(40,70,40,0.06),0 48% 0 -2.5px rgba(40,70,40,0.04),0 68% 0 -2.5px rgba(40,70,40,0.05),0 85% 0 -2.5px rgba(40,70,40,0.04);
+}
+.bamboo-right::before {
+    content: ""; position: absolute; right: 2px; top: 10%;
+    width: 7px; height: 46%;
+    background: linear-gradient(270deg,rgba(50,90,50,0.08),rgba(70,130,70,0.14),rgba(50,90,50,0.08));
+    border-radius: 3px;
+    box-shadow: 0 10% 0 -3px rgba(41,71,41,0.06),0 24% 0 -3px rgba(41,71,41,0.07),0 42% 0 -3px rgba(41,71,41,0.05),0 60% 0 -3px rgba(41,71,41,0.06),0 78% 0 -3px rgba(41,71,41,0.05);
+}
+.bamboo-right::after {
+    content: ""; position: absolute; right: 16px; top: 25%;
+    width: 5px; height: 32%;
+    background: linear-gradient(270deg,rgba(60,100,60,0.05),rgba(80,140,80,0.09),rgba(60,100,60,0.05));
+    border-radius: 2px;
+    box-shadow: 0 15% 0 -2.5px rgba(41,71,41,0.04),0 35% 0 -2.5px rgba(41,71,41,0.05),0 55% 0 -2.5px rgba(41,71,41,0.04),0 75% 0 -2.5px rgba(41,71,41,0.04);
+}
+body>*{position:relative;z-index:1}
+.title{font-size:2.2rem;font-weight:bold;margin-bottom:8px;text-shadow:2px 2px 4px rgba(0,0,0,0.15);letter-spacing:6px;color:#2a1a0a}
+.subtitle{font-size:0.9rem;color:#8a7a6a;margin-bottom:16px;letter-spacing:2px}
+.game-container{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+.info-panel{background:rgba(255,252,245,0.85);border-radius:12px;padding:14px 16px;min-width:220px;border:2px solid #d4c4a8;box-shadow:0 4px 16px rgba(0,0,0,0.08),inset 0 0 30px rgba(139,119,90,0.05)}
+.info-panel h3{font-size:1rem;margin-bottom:8px;color:#5a4a3a;border-bottom:1px solid #d4c4a8;padding-bottom:6px}
+.player-info{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.player-card{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;background:rgba(139,119,90,0.06);font-size:0.85rem}
+.player-card .player-name{font-weight:bold;color:#5a4a3a}
+.player-card .player-color{font-size:0.75rem;color:#8a7a6a}
+.player-card .player-score{font-weight:bold;font-size:1.1rem;color:#b85a30}
+.player-card.current-turn{background:rgba(184,90,48,0.12);border:1px solid rgba(184,90,48,0.3)}
+.turn-indicator{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;border-radius:10px;background:rgba(139,119,90,0.07);font-size:0.8rem}
+.turn-dot{width:18px;height:18px;border-radius:50%;border:2px solid #b0a088;transition:all 0.3s}
+.turn-dot.black{background:#2a2a2a;border-color:#555}
+.turn-dot.white{background:#f5f0e8;border-color:#b0a088}
+.turn-dot.active{box-shadow:0 0 10px rgba(80,40,0,0.4)}
+.current-piece{text-align:center;padding:10px;border-radius:10px;background:rgba(139,119,90,0.06);margin-bottom:10px}
+.current-piece .label{font-size:0.75rem;color:#8a7a6a;margin-bottom:4px}
+.current-piece .piece-icon{font-size:2.4rem;display:block}
+.current-piece .piece-type{font-size:0.85rem;margin-top:2px;color:#5a4a3a}
+
+.rules-box{margin-top:10px;font-size:0.7rem;color:#6a5a4a;line-height:1.8}
+.rules-box span{color:#b85a30;font-weight:bold}
+.board-wrapper{position:relative;background:#faf6ed;border-radius:8px;padding:12px;box-shadow:0 4px 20px rgba(80,40,0,0.12),inset 0 0 40px rgba(139,119,90,0.08);border:2px solid #d4c4a8}
+canvas{display:block;cursor:pointer;border-radius:2px;touch-action:manipulation;max-width:100%;height:auto;image-rendering:crisp-edges}
+.btn-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:center}
+.btn{padding:10px 24px;border:none;border-radius:8px;font-size:0.9rem;cursor:pointer;font-family:inherit;transition:all 0.2s;font-weight:bold}
+.btn-primary{background:#8b5a30;color:#faf6ed}
+.btn-primary:hover{background:#6b3a20;transform:translateY(-1px)}
+.btn-secondary{background:#d4c4a8;color:#3a2a1a}
+.btn-secondary:hover{background:#c4b498;transform:translateY(-1px)}
+.btn-danger{background:#a03030;color:#faf6ed}
+.btn-danger:hover{background:#802020;transform:translateY(-1px)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#faf6ed;border-radius:16px;padding:28px 32px;text-align:center;border:2px solid #d4c4a8;box-shadow:0 8px 32px rgba(0,0,0,0.2);min-width:300px}
+.modal-box h3{font-size:1.3rem;color:#3a2a1a;margin-bottom:8px}
+.modal-box p{color:#6a5a4a;font-size:0.9rem;margin-bottom:20px}
+.modal-btns{display:flex;flex-direction:column;gap:10px}
+.modal-btn{padding:12px 20px;border:2px solid #d4c4a8;border-radius:10px;background:rgba(255,252,245,0.9);font-size:1rem;cursor:pointer;font-family:inherit;transition:all 0.2s;color:#3a2a1a}
+.modal-btn:hover{background:rgba(184,90,48,0.1);border-color:#b85a30;transform:translateY(-1px)}
+.modal-btn.random-btn{background:rgba(139,119,90,0.1);border-style:dashed}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 28px;border-radius:24px;font-weight:bold;font-size:1rem;z-index:100;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.win{background:linear-gradient(135deg,#8b3a20,#c05030);color:#faf6ed;box-shadow:0 4px 20px rgba(139,58,32,0.4)}
+.toast.warn{background:linear-gradient(135deg,#b8860b,#d4a030);color:#fff;box-shadow:0 4px 20px rgba(184,134,11,0.4)}
+.toast.info{background:rgba(250,246,237,0.95);color:#3a2a1a;border:1px solid #d4c4a8}
+.kb-shortcuts{margin-top:10px;font-size:0.68rem;color:#6a5a4a;line-height:2.0;padding:10px 12px;background:rgba(139,119,90,0.06);border-radius:8px;border:1.5px solid #d4c4a8;transition:all 0.2s}
+.kb-shortcuts .kb-title{font-size:0.75rem;font-weight:bold;color:#4a3520;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kb-shortcuts .kb-row{margin:3px 0;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.kb-shortcuts .kb-key{display:inline-block;background:linear-gradient(180deg,rgba(255,252,245,0.9),rgba(235,225,210,0.9));border:1.5px solid #b8a888;border-bottom:3px solid #a09070;border-radius:5px;padding:2px 6px;font-family:"Consolas","Courier New",monospace;font-size:0.68rem;font-weight:bold;color:#3a2a1a;min-width:20px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,0.08)}
+@media (max-width:768px){.kb-shortcuts{font-size:0.62rem;line-height:1.8;padding:8px 10px}.kb-shortcuts .kb-title{font-size:0.67rem}.kb-shortcuts .kb-key{font-size:0.6rem;padding:2px 4px;min-width:16px}}
+@media (max-width:768px){
+    body{padding:8px 4px;justify-content:flex-start}
+    .title{font-size:1.4rem;margin-bottom:4px;letter-spacing:3px}
+    .subtitle{font-size:0.75rem;margin-bottom:8px}
+    .game-container{flex-direction:column;align-items:center;gap:10px}
+    .info-panel{min-width:auto;width:100%;padding:10px 14px;border-radius:10px}
+    .info-panel h3{font-size:0.9rem;margin-bottom:6px;padding-bottom:4px}
+    .player-card{font-size:0.78rem;padding:5px 8px}
+    .player-card .player-score{font-size:0.95rem}
+    .turn-indicator{font-size:0.75rem;padding:6px 8px;margin-bottom:8px;gap:6px}
+    .turn-dot{width:14px;height:14px}
+    .current-piece{padding:8px;margin-bottom:8px}
+    .current-piece .piece-icon{font-size:2rem}
+    .current-piece .piece-type{font-size:0.75rem}
+    .current-piece .label{font-size:0.7rem}
+    .rules-box{font-size:0.65rem;line-height:1.6;margin-top:6px}
+    .board-wrapper{padding:8px}
+    .btn{padding:8px 12px;font-size:0.78rem}
+    .btn-row{gap:8px;margin-top:10px}
+    .modal-box{padding:20px 24px;min-width:auto;width:85vw}
+    .modal-box h3{font-size:1.1rem}
+    .modal-btn{font-size:0.9rem;padding:10px 16px}
+}
+</style>
+</head>
+<body>
+<div class="title">🎯 猜拳五子棋 🎯</div>
+<div class="subtitle">水墨五子 · 石头剪刀布</div>
+<div class="game-container">
+    <div class="info-panel">
+        <h3>📋 对局信息</h3>
+        <div class="player-info">
+            <div class="player-card" id="player1Card">
+                <div>
+                    <span class="player-name">👤 玩家1</span>
+                    <span class="player-color" id="p1Color"></span>
+                </div>
+                <span class="player-score" id="player1Score">0</span>
+            </div>
+            <div class="player-card" id="player2Card">
+                <div>
+                    <span class="player-name">👤 玩家2</span>
+                    <span class="player-color" id="p2Color"></span>
+                </div>
+                <span class="player-score" id="player2Score">0</span>
+            </div>
+        </div>
+        <div class="turn-indicator">
+            <div class="turn-dot black active" id="turnDot"></div>
+            <span id="turnText">黑方回合</span>
+        </div>
+        <div class="current-piece">
+            <div class="label">本回合棋子</div>
+            <span class="piece-icon" id="pieceIcon">?</span>
+            <div class="piece-type" id="pieceTypeText">等待落子</div>
+        </div>
+        <div class="rules-box">
+            <div>⚡ 落子规则 · 五连后对方有一回合</div>
+            <div>    猜拳机会，设法破解阻止五连</div>
+            <div style="margin-top:2px"><span>✊</span>赢<span>✌️</span>  <span>✌️</span>赢<span>✋</span>  <span>✋</span>赢<span>✊</span></div>
+            <div>双方不可预知 · 概率各 1/3</div>
+        </div>
+
+        <div class="kb-shortcuts">
+            <div class="kb-title">⌨️ 键盘操作说明</div>
+            <div style="font-weight:bold;color:#4a3520;font-size:0.7rem;margin-bottom:2px">👤 玩家1（当前回合时操作）</div>
+            <div class="kb-row">
+                <span class="kb-key">↑</span><span class="kb-key">↓</span><span class="kb-key">←</span><span class="kb-key">→</span>
+                <span>移动光标</span>
+            </div>
+            <div class="kb-row">
+                <span class="kb-key">Space</span>
+                <span>确认落子</span>
+            </div>
+            <div style="font-weight:bold;color:#4a3520;font-size:0.7rem;margin:4px 0 2px">👤 玩家2（当前回合时操作）</div>
+            <div class="kb-row">
+                <span class="kb-key"> · </span><span class="kb-key"> · </span><span class="kb-key"> · </span><span class="kb-key"> · </span>
+                <span>移动光标</span>
+            </div>
+            <div class="kb-row">
+                <span class="kb-key">Enter</span>
+                <span>确认落子</span>
+            </div>
+        </div>
+
+    </div>
+    <div>
+        <div class="board-wrapper">
+            <canvas id="boardCanvas"></canvas>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-primary" onclick="game.newGame()">🔄 新游戏</button>
+            <button class="btn btn-secondary" onclick="game.undo()">↩ 悔棋</button>
+            <button class="btn btn-secondary" onclick="game.resetScore()">🔄 重置比分</button>
+            <button class="btn btn-danger" onclick="game.surrender()">🏳 投降</button>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay show" id="colorModal">
+    <div class="modal-box">
+        <h3>🎨 选择棋子颜色</h3>
+        <p id="colorModalPrompt">玩家1，请选择本局你的棋子颜色：</p>
+        <div class="modal-btns">
+            <button class="modal-btn" onclick="game.selectColor('black')">⚫ 黑棋（先手）</button>
+            <button class="modal-btn" onclick="game.selectColor('white')">⚪ 白棋（后手）</button>
+            <button class="modal-btn random-btn" onclick="game.selectColor('random')">🎲 随机分配</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="seal-stamp">水墨<br>五子</div>
+<div class="bamboo-left"></div>
+<div class="bamboo-right"></div>
+<script>
+const EMPTY=0; const BLACK=1; const WHITE=2;
+const ROCK="rock"; const SCISSORS="scissors"; const PAPER="paper";
+const TYPE_EMOJI={rock:"🪨",scissors:"✌️",paper:"✋"};
+const TYPE_NAME={rock:"石头",scissors:"剪刀",paper:"布"};
+const COVERS={rock:SCISSORS,scissors:PAPER,paper:ROCK};
+const COVERS_EMOJI={rock:"✌️",scissors:"✋",paper:"🪨"};
+const COVERS_NAME={rock:"剪刀",scissors:"布",paper:"石头"};
+class GomokuRPS{
+    constructor(){
+        this.size=19; this.cellSize=28; this.padding=24;
+        this.board=Array.from({length:this.size},()=>Array(this.size).fill(null)); this.currentPlayer=BLACK; this.currentType=null;
+        this.gameOver=false; this.winner=null; this.winLine=[];
+        this.lastMove=null; this.hoverCell=null;
+        this.player1Score=0; this.player2Score=0; this.moveCount=0;
+        this.player1Color=null; this.player2Color=null;
+        this.potentialWinLine=null; this.potentialWinPlayer=null; this.kbCursor={row:9,col:9}; this.history=[];
+        this.choosingPlayer=1; this.kbCursor={row:9,col:9}; this.history=[];
+        this.canvas=document.getElementById("boardCanvas");
+        this.ctx=this.canvas.getContext("2d");
+        this.noisePoints=[];
+        this.setupCanvas(); this.bindEvents(); this.showColorModal();
+    }
+    setupCanvas(){
+        this.fitBoard();
+        window.addEventListener("resize",()=>{ this.fitBoard(); this.render(); });
+    }
+    fitBoard(){
+        const rawDpr=window.devicePixelRatio||1;
+        const dpr=Math.max(3,rawDpr);
+        const maxW=Math.min(window.innerWidth-20,880);
+        const maxH=Math.min(window.innerHeight-280,880);
+        const maxDim=Math.min(maxW,maxH);
+        this.padding=18; this.cellSize=Math.floor((maxDim-this.padding*2)/this.size);
+        this.cellSize=Math.max(24,Math.min(this.cellSize,38));
+        const total=this.size*this.cellSize+this.padding*2;
+        this.canvas.width=total*dpr; this.canvas.height=total*dpr;
+        this.canvas.style.width=total+"px"; this.canvas.style.height=total+"px";
+        this.ctx.setTransform(dpr,0,0,dpr,0,0);
+        this.generateNoise();
+    }
+    showColorModal(){
+        document.getElementById("colorModal").classList.add("show");
+        document.getElementById("colorModalPrompt").textContent="玩家"+this.choosingPlayer+"，请选择本局你的棋子颜色：";
+        this.gameOver=true; this.render();
+    }
+    selectColor(choice){
+        let p1IsBlack;
+        if(choice==="random"){ p1IsBlack=Math.random()<0.5; }
+        else{ p1IsBlack=(choice==="black"); }
+        if(this.choosingPlayer===1){
+            this.player1Color=p1IsBlack?BLACK:WHITE;
+            this.player2Color=p1IsBlack?WHITE:BLACK;
+        }else{
+            this.player2Color=p1IsBlack?BLACK:WHITE;
+            this.player1Color=p1IsBlack?WHITE:BLACK;
+        }
+        this.choosingPlayer=this.choosingPlayer===1?2:1;
+        document.getElementById("colorModal").classList.remove("show");
+        this.startGame();
+    }
+    startGame(){
+        this.board=Array.from({length:this.size},()=>Array(this.size).fill(null));
+        this.currentPlayer=BLACK; this.gameOver=false; this.winner=null;
+        this.winLine=[]; this.lastMove=null; this.moveCount=0;
+        this.potentialWinLine=null; this.potentialWinPlayer=null; this.kbCursor={row:9,col:9}; this.history=[];
+        this.rollType(); this.updateUI(); this.render(); this.hideToast();
+    }
+    newGame(){ this.showColorModal(); }
+    resetScore(){
+        this.player1Score=0; this.player2Score=0;
+        document.getElementById("player1Score").textContent="0";
+        document.getElementById("player2Score").textContent="0";
+        this.showColorModal();
+    }
+    countPiecesByType(color){
+        const counts={rock:0,scissors:0,paper:0};
+        for(let r=0;r<this.size;r++){for(let c=0;c<this.size;c++){const p=this.board[r][c];if(p&&p.color===color)counts[p.type]++;}}
+        return counts;
+    }
+    computeCoverableProbs(){
+        const opponent=this.currentPlayer===BLACK?WHITE:BLACK;
+        const oppCounts=this.countPiecesByType(opponent);
+        const weights={rock:oppCounts.scissors,scissors:oppCounts.paper,paper:oppCounts.rock};
+        const total=weights.rock+weights.scissors+weights.paper;
+        if(total===0)return{rock:1/3,scissors:1/3,paper:1/3};
+        return{rock:weights.rock/total,scissors:weights.scissors/total,paper:weights.paper/total};
+    }
+    evaluateThreat(color){
+        let score=0;const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+        for(let r=0;r<this.size;r++){for(let c=0;c<this.size;c++){
+            const piece=this.board[r][c];if(!piece||piece.color!==color)continue;
+            for(const[dr,dc]of dirs){
+                const pr=r-dr,pc=c-dc;
+                if(pr>=0&&pr<this.size&&pc>=0&&pc<this.size&&this.board[pr][pc]&&this.board[pr][pc].color===color)continue;
+                let count=1;let cr=r+dr,cc=c+dc;
+                while(cr>=0&&cr<this.size&&cc>=0&&cc<this.size&&this.board[cr][cc]&&this.board[cr][cc].color===color){count++;cr+=dr;cc+=dc;}
+                if(count<2)continue;
+                const beforeOpen=(pr>=0&&pr<this.size&&pc>=0&&pc<this.size&&!this.board[pr][pc]);
+                const afterOpen=(cr>=0&&cr<this.size&&cc>=0&&cc<this.size&&!this.board[cr][cc]);
+                const openEnds=(beforeOpen?1:0)+(afterOpen?1:0);
+                if(count>=5)score+=100;
+                else if(count===4&&openEnds===2)score+=20;
+                else if(count===4&&openEnds===1)score+=10;
+                else if(count===3&&openEnds===2)score+=6;
+                else if(count===2&&openEnds===2)score+=2;
+            }
+        }}
+        return score;
+    }
+    computeThreatBias(){
+        const opponent=this.currentPlayer===BLACK?WHITE:BLACK;
+        const currentThreat=this.evaluateThreat(this.currentPlayer);
+        const oppThreat=this.evaluateThreat(opponent);
+        const totalThreat=currentThreat+oppThreat;
+        if(totalThreat===0)return 0.5;
+        return 0.2+0.6*(oppThreat/totalThreat);
+    }
+    computeCountDiffBias(){
+        const opponent=this.currentPlayer===BLACK?WHITE:BLACK;
+        let currentCount=0,oppCount=0;
+        for(let r=0;r<this.size;r++){for(let c=0;c<this.size;c++){const p=this.board[r][c];if(!p)continue;if(p.color===this.currentPlayer)currentCount++;else if(p.color===opponent)oppCount++;}}
+        const total=currentCount+oppCount;
+        if(total===0)return 0.5;
+        return 0.2+0.6*(oppCount/total);
+    }
+    rollType(){
+        const mc=this.moveCount;
+        if(mc<30){const r=Math.random();if(r<1/3)this.currentType=ROCK;else if(r<2/3)this.currentType=SCISSORS;else this.currentType=PAPER;return;}
+        const covProbs=this.computeCoverableProbs();
+        let biasStrength;
+        if(mc<150){
+            const threatBias=this.computeThreatBias();
+            const countBias=this.computeCountDiffBias();
+            biasStrength=Math.max(0.06,Math.min(0.80,0.50+(threatBias-0.5)*0.35+(countBias-0.5)*0.25));
+        }else{
+            const threatBias=this.computeThreatBias();
+            const countBias=this.computeCountDiffBias();
+            biasStrength=Math.max(0.10,Math.min(0.88,0.55+(threatBias-0.5)*0.35+(countBias-0.5)*0.25));
+        }
+        const dynamicProbs={
+            rock:(1/3)*(1-biasStrength)+covProbs.rock*biasStrength,
+            scissors:(1/3)*(1-biasStrength)+covProbs.scissors*biasStrength,
+            paper:(1/3)*(1-biasStrength)+covProbs.paper*biasStrength,
+        };
+        const fp={
+            rock:(1/3)*0.65+dynamicProbs.rock*0.35,
+            scissors:(1/3)*0.65+dynamicProbs.scissors*0.35,
+            paper:(1/3)*0.65+dynamicProbs.paper*0.35,
+        };
+        const r=Math.random();
+        if(r<fp.rock)this.currentType=ROCK;
+        else if(r<fp.rock+fp.scissors)this.currentType=SCISSORS;
+        else this.currentType=PAPER;
+    }
+    isValidMove(row,col){
+        if(this.gameOver)return false;
+        if(row<0||row>=this.size||col<0||col>=this.size)return false;
+        const cell=this.board[row][col];
+        if(cell===null)return true;
+        if(COVERS[this.currentType]===cell.type)return true;
+        return false;
+    }
+    placePiece(row,col){
+        if(!this.isValidMove(row,col))return false;
+        const cell=this.board[row][col];
+        this.history.push({row,col,prevCell:cell?{color:cell.color,type:cell.type}:null,currentPlayer:this.currentPlayer,currentType:this.currentType,moveCount:this.moveCount,potentialWinLine:this.potentialWinLine?this.potentialWinLine.map(([r,c])=>[r,c]):null,potentialWinPlayer:this.potentialWinPlayer,gameOver:this.gameOver,winner:this.winner,winLine:this.winLine.map(([r,c])=>[r,c]),lastMove:this.lastMove?{row:this.lastMove.row,col:this.lastMove.col}:null});
+        this.board[row][col]={color:this.currentPlayer,type:this.currentType};
+        this.lastMove={row,col}; this.moveCount++;
+        if(this.potentialWinLine!==null){
+            const stillIntact=this.potentialWinLine.every(([r,c])=>{ const p=this.board[r][c]; return p&&p.color===this.potentialWinPlayer; });
+            if(stillIntact){
+                this.gameOver=true; this.winner=this.potentialWinPlayer; this.winLine=this.potentialWinLine;
+                this.awardScore(this.potentialWinPlayer); this.showWinToast();
+            }else{
+                this.potentialWinLine=null; this.potentialWinPlayer=null; this.kbCursor={row:9,col:9}; this.history=[];
+                this.currentPlayer=this.currentPlayer===BLACK?WHITE:BLACK; this.rollType();
+            }
+            this.updateUI(); this.render(); return true;
+        }
+        const fiveLine=this.checkWin(row,col);
+        if(fiveLine){
+            const nextPlayer=this.currentPlayer===BLACK?WHITE:BLACK;
+            const savedType=this.currentType;
+            this.rollType(); const oppType=this.currentType; this.currentType=savedType;
+            this.potentialWinLine=fiveLine; this.potentialWinPlayer=this.currentPlayer;
+            this.currentPlayer=nextPlayer; this.currentType=oppType;
+            this.showToast("五子连珠！对方有机会用猜拳破解！","warn");
+        }else if(this.moveCount>=this.size*this.size){
+            this.gameOver=true; this.winner=null;
+        }else{
+            this.currentPlayer=this.currentPlayer===BLACK?WHITE:BLACK; this.rollType();
+        }
+        
+this.updateUI(); this.render(); return true;
+    }
+    checkWin(row,col){
+        const piece=this.board[row][col]; if(!piece)return null; const color=piece.color;
+        const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+        for(const[dr,dc]of dirs){
+            const line=[[row,col]];
+            for(let i=1;i<5;i++){ const r=row+dr*i; const c=col+dc*i; if(r>=0&&r<this.size&&c>=0&&c<this.size&&this.board[r][c]&&this.board[r][c].color===color){ line.push([r,c]); }else break; }
+            for(let i=1;i<5;i++){ const r=row-dr*i; const c=col-dc*i; if(r>=0&&r<this.size&&c>=0&&c<this.size&&this.board[r][c]&&this.board[r][c].color===color){ line.unshift([r,c]); }else break; }
+            if(line.length>=5)return line;
+        }
+        return null;
+    }
+    bindEvents(){
+        this.canvas.addEventListener("click",(e)=>{
+            if(this.gameOver)return;
+            const rect=this.canvas.getBoundingClientRect();
+            const x=e.clientX-rect.left; const y=e.clientY-rect.top;
+            const col=Math.round((x-this.padding)/this.cellSize);
+            const row=Math.round((y-this.padding)/this.cellSize);
+            if(row>=0&&row<this.size&&col>=0&&col<this.size)this.placePiece(row,col);
+        });
+        this.canvas.addEventListener("mousemove",(e)=>{
+            const rect=this.canvas.getBoundingClientRect();
+            const x=e.clientX-rect.left; const y=e.clientY-rect.top;
+            const col=Math.round((x-this.padding)/this.cellSize);
+            const row=Math.round((y-this.padding)/this.cellSize);
+            const nh=(row>=0&&row<this.size&&col>=0&&col<this.size)?{row,col}:null;
+            const ok=this.hoverCell?`${this.hoverCell.row},${this.hoverCell.col}`:null;
+            const nk=nh?`${nh.row},${nh.col}`:null;
+            if(ok!==nk){ this.hoverCell=nh; this.render(); }
+        });
+        this.canvas.addEventListener("mouseleave",()=>{ if(this.hoverCell){this.hoverCell=null;this.render();} });
+        document.addEventListener("keydown",(e)=>{
+            if(this.gameOver||document.getElementById("colorModal").classList.contains("show"))return;
+            const kc=this.kbCursor;
+            const p1=(this.currentPlayer===this.player1Color);
+            const p2=(this.currentPlayer===this.player2Color);
+            if(p1){ if(e.key==="w"||e.key==="W")kc.row=Math.max(0,kc.row-1); else if(e.key==="s"||e.key==="S")kc.row=Math.min(this.size-1,kc.row+1); else if(e.key==="a"||e.key==="A")kc.col=Math.max(0,kc.col-1); else if(e.key==="d"||e.key==="D")kc.col=Math.min(this.size-1,kc.col+1); else if(e.key===" ") { e.preventDefault(); this.placePiece(kc.row,kc.col); return; } else return; }
+            else if(p2){ if(e.key==="ArrowUp")kc.row=Math.max(0,kc.row-1); else if(e.key==="ArrowDown")kc.row=Math.min(this.size-1,kc.row+1); else if(e.key==="ArrowLeft")kc.col=Math.max(0,kc.col-1); else if(e.key==="ArrowRight")kc.col=Math.min(this.size-1,kc.col+1); else if(e.key==="Enter"){ e.preventDefault(); this.placePiece(kc.row,kc.col); return; } else return; }
+            else return;
+            this.render();
+        });
+    }
+    generateNoise(){
+        const w=this.size*this.cellSize+this.padding*2;
+        const h=w;
+        this.noisePoints=[];
+        for(let i=0;i<200;i++){
+            this.noisePoints.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+0.5});
+        }
+    }
+    render(){
+        const ctx=this.ctx; const w=this.canvas.width; const h=this.canvas.height;
+        ctx.fillStyle="#faf6ed"; ctx.fillRect(0,0,w,h);
+        ctx.fillStyle="rgba(200,180,150,0.03)"; for(let i=0;i<this.noisePoints.length;i++){ const p=this.noisePoints[i]; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }
+        ctx.save(); ctx.globalAlpha=0.04;
+        ctx.restore();
+        ctx.strokeStyle="#5a4a30"; ctx.lineWidth=1;
+        for(let i=0;i<this.size;i++){ const p=this.padding+i*this.cellSize; ctx.beginPath(); ctx.moveTo(this.padding,p); ctx.lineTo(this.padding+(this.size-1)*this.cellSize,p); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p,this.padding); ctx.lineTo(p,this.padding+(this.size-1)*this.cellSize); ctx.stroke(); }
+        const sps=[[3,3],[3,9],[3,15],[9,3],[9,9],[9,15],[15,3],[15,9],[15,15]];
+        for(const[r,c]of sps){ const cx=this.padding+c*this.cellSize; const cy=this.padding+r*this.cellSize; ctx.fillStyle="#3a2a10"; ctx.beginPath(); ctx.arc(cx,cy,3.5,0,Math.PI*2); ctx.fill(); }
+        if(this.potentialWinLine&&!this.gameOver){ for(const[r,c]of this.potentialWinLine){ const cx=this.padding+c*this.cellSize; const cy=this.padding+r*this.cellSize; ctx.strokeStyle="#d4a030"; ctx.lineWidth=3; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.46,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); } }
+        for(let r=0;r<this.size;r++){ for(let c=0;c<this.size;c++){ const piece=this.board[r][c]; if(piece){ const cx=this.padding+c*this.cellSize; const cy=this.padding+r*this.cellSize; this.drawPiece(cx,cy,piece.color,piece.type,false); } } }
+        if(this.hoverCell&&!this.gameOver){ const{row,col}=this.hoverCell; const cx=this.padding+col*this.cellSize; const cy=this.padding+row*this.cellSize; const valid=this.isValidMove(row,col); if(valid){ const io=this.board[row][col]!==null; if(io){ ctx.strokeStyle="#c05030"; ctx.lineWidth=2.5; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.46,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); } this.drawPiece(cx,cy,this.currentPlayer,this.currentType,true,io); }else{ ctx.fillStyle="rgba(180,80,40,0.12)"; ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.46,0,Math.PI*2); ctx.fill(); } }
+        if(this.kbCursor&&!this.gameOver){ const{row,col}=this.kbCursor; const cx=this.padding+col*this.cellSize; const cy=this.padding+row*this.cellSize; const p1turn=(this.currentPlayer===this.player1Color); ctx.strokeStyle="#4a90d9"; ctx.lineWidth=2.5; ctx.setLineDash([5,3]); ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.48,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle="rgba(74,144,217,0.12)"; ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.47,0,Math.PI*2); ctx.fill(); const hintText=p1turn?"WASD / Space":"Arrows / Enter"; ctx.font="bold "+(this.cellSize*0.32)+"px 'Microsoft YaHei','PingFang SC',sans-serif"; const tm=ctx.measureText(hintText); const lx=cx+this.cellSize*0.6; const ly=cy-this.cellSize*0.65; const lw=tm.width+10; const lh=this.cellSize*0.42; ctx.fillStyle="rgba(74,144,217,0.88)"; ctx.beginPath(); const rx=lx-2; const ry=ly-lh/2-2; ctx.moveTo(rx+4,ry); ctx.lineTo(rx+lw-4,ry); ctx.quadraticCurveTo(rx+lw,ry,rx+lw,ry+4); ctx.lineTo(rx+lw,ry+lh-4); ctx.quadraticCurveTo(rx+lw,ry+lh,rx+lw-4,ry+lh); ctx.lineTo(rx+4,ry+lh); ctx.quadraticCurveTo(rx,ry+lh,rx,ry+lh-4); ctx.lineTo(rx,ry+4); ctx.quadraticCurveTo(rx,ry,rx+4,ry); ctx.closePath(); ctx.fill(); ctx.fillStyle="#fff"; ctx.textAlign="left"; ctx.textBaseline="middle"; ctx.fillText(hintText,lx+3,ly); ctx.textAlign="start"; ctx.textBaseline="alphabetic"; }
+        if(this.winLine.length>0){ for(const[r,c]of this.winLine){ const cx=this.padding+c*this.cellSize; const cy=this.padding+r*this.cellSize; ctx.strokeStyle="#b83020"; ctx.lineWidth=3; ctx.shadowColor="#b83020"; ctx.shadowBlur=8; ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.47,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur=0; } }
+        if(this.lastMove&&!this.gameOver){ const cx=this.padding+this.lastMove.col*this.cellSize; const cy=this.padding+this.lastMove.row*this.cellSize; ctx.strokeStyle="#e04040"; ctx.lineWidth=2.5; ctx.shadowColor="#e04040"; ctx.shadowBlur=6; ctx.beginPath(); ctx.arc(cx,cy,this.cellSize*0.48,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur=0; }
+    }    drawPiece(cx,cy,color,type,ghost,isOverride=false){
+        const ctx=this.ctx; const r=this.cellSize*0.43; const alpha=ghost?0.5:1.0;
+        ctx.save(); ctx.globalAlpha=alpha;
+        // 3D sphere with shadow, gradient, and multiple highlight rings
+        ctx.shadowColor="rgba(0,0,0,0.4)"; ctx.shadowBlur=r*0.35; ctx.shadowOffsetX=r*0.06; ctx.shadowOffsetY=r*0.12;
+        const grad=ctx.createRadialGradient(cx-r*0.32,cy-r*0.38,r*0.08,cx,cy,r);
+        if(color===BLACK){
+            grad.addColorStop(0,"#999");
+            grad.addColorStop(0.3,"#555");
+            grad.addColorStop(0.55,"#2a2a2a");
+            grad.addColorStop(0.8,"#111");
+            grad.addColorStop(1,"#050505");
+        }else{
+            grad.addColorStop(0,"#ffffff");
+            grad.addColorStop(0.3,"#faf6ef");
+            grad.addColorStop(0.55,"#f0e8d8");
+            grad.addColorStop(0.8,"#d8cfb8");
+            grad.addColorStop(1,"#b8af9a");
+        }
+        ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+        ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.shadowOffsetX=0; ctx.shadowOffsetY=0;
+        // Outer rim
+        ctx.strokeStyle=color===BLACK?"#222":"#a09888"; ctx.lineWidth=Math.max(1.8,r*0.11); ctx.stroke();
+        // Specular highlight (top-left light reflection)
+        ctx.strokeStyle=color===BLACK?"rgba(255,255,255,0.18)":"rgba(255,255,255,0.7)";
+        ctx.lineWidth=Math.max(1.2,r*0.07);
+        ctx.beginPath(); ctx.arc(cx-r*0.06,cy-r*0.09,r*0.72,-Math.PI*0.7,Math.PI*0.3); ctx.stroke();
+        // Secondary inner ring for material depth
+        ctx.strokeStyle=color===BLACK?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.05)";
+        ctx.lineWidth=Math.max(0.8,r*0.05);
+        ctx.beginPath(); ctx.arc(cx-r*0.04,cy-r*0.06,r*0.58,0,Math.PI*2); ctx.stroke();
+        // Override dashed indicator
+        if(isOverride&&!ghost){
+            ctx.strokeStyle="#c05030"; ctx.lineWidth=Math.max(2.2,r*0.13);
+            ctx.setLineDash([r*0.22,r*0.13]); ctx.beginPath(); ctx.arc(cx,cy,r+Math.max(2.5,r*0.12),0,Math.PI*2);
+            ctx.stroke(); ctx.setLineDash([]);
+        }
+        // Draw emoji icon on piece
+        const emoji=TYPE_EMOJI[type]||"?";
+        const fontSize=r*1.22;
+        ctx.font=fontSize+"px 'Microsoft YaHei','PingFang SC','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(emoji,cx,cy);
+        ctx.textAlign="start"; ctx.textBaseline="alphabetic";
+        ctx.restore();
+    }
+        awardScore(color){
+        if(this.player1Color===color)this.player1Score++;
+        else if(this.player2Color===color)this.player2Score++;
+    }
+    getCurrentPlayerName(){
+        if(this.currentPlayer===this.player1Color)return"玩家1";
+        if(this.currentPlayer===this.player2Color)return"玩家2";
+        return"";
+    }
+    getWinnerPlayerName(){
+        if(!this.winner)return"";
+        if(this.winner===this.player1Color)return"玩家1";
+        if(this.winner===this.player2Color)return"玩家2";
+        return"";
+    }
+    updateUI(){
+        const td=document.getElementById("turnDot"); const tt=document.getElementById("turnText");
+        const pi=document.getElementById("pieceIcon"); const pt=document.getElementById("pieceTypeText");
+        
+        const p1c=document.getElementById("player1Card"); const p2c=document.getElementById("player2Card");
+        const p1col=document.getElementById("p1Color"); const p2col=document.getElementById("p2Color");
+        if(this.player1Color===BLACK){ p1col.textContent=" ⚫黑棋"; p2col.textContent=" ⚪白棋"; }
+        else{ p1col.textContent=" ⚪白棋"; p2col.textContent=" ⚫黑棋"; }
+        if(!this.gameOver){
+            const cpn=this.getCurrentPlayerName();
+            if(cpn==="玩家1"){ p1c.classList.add("current-turn"); p2c.classList.remove("current-turn"); }
+            else{ p2c.classList.add("current-turn"); p1c.classList.remove("current-turn"); }
+        }else{ p1c.classList.remove("current-turn"); p2c.classList.remove("current-turn"); }
+        document.getElementById("player1Score").textContent=this.player1Score;
+        document.getElementById("player2Score").textContent=this.player2Score;
+        if(this.gameOver){
+            if(this.winner){ const wn=this.getWinnerPlayerName(); tt.textContent=wn+"获胜！🎉"; td.className="turn-dot "+(this.winner===BLACK?"black":"white")+" active"; }
+            else{ tt.textContent="平局！"; td.className="turn-dot"; }
+            pi.textContent="🏆"; pt.textContent="游戏结束";
+        }else{
+            const pn=this.getCurrentPlayerName(); const cn=this.currentPlayer===BLACK?"黑方":"白方";
+            tt.textContent=pn+" · "+cn+"回合";
+            if(this.potentialWinLine)tt.textContent+=" ⚠破解机会！";
+            td.className="turn-dot "+(this.currentPlayer===BLACK?"black":"white")+" active";
+            pi.textContent=TYPE_EMOJI[this.currentType]||"?"; pt.textContent=TYPE_NAME[this.currentType]||"";
+        }
+        
+    }
+    showToast(text,type="info"){ const toast=document.getElementById("toast"); toast.textContent=text; toast.className="toast "+type+" show"; setTimeout(()=>toast.classList.remove("show"),3000); }
+    showWinToast(){ const wn=this.getWinnerPlayerName(); this.showToast(wn+" 猜拳破解获胜！🎉","win"); }
+    hideToast(){ document.getElementById("toast").classList.remove("show"); }
+    undo(){
+        if(this.gameOver||this.history.length===0||document.getElementById("colorModal").classList.contains("show"))return;
+        const s=this.history.pop();
+        this.board[s.row][s.col]=s.prevCell;
+        this.lastMove=s.lastMove;
+        this.moveCount=s.moveCount;
+        this.currentPlayer=s.currentPlayer;
+        this.currentType=s.currentType;
+        this.potentialWinLine=s.potentialWinLine;
+        this.potentialWinPlayer=s.potentialWinPlayer;
+        this.gameOver=s.gameOver;
+        this.winner=s.winner;
+        this.winLine=s.winLine;
+        this.kbCursor={row:s.row,col:s.col};
+        this.updateUI(); this.render(); this.hideToast();
+    }
+    surrender(){
+        if(this.gameOver||document.getElementById("colorModal").classList.contains("show"))return;
+        this.gameOver=true;
+        this.winner=this.currentPlayer===BLACK?WHITE:BLACK;
+        this.awardScore(this.winner);
+        this.showWinToast();
+        this.updateUI(); this.render();
+    }
+}
+const game=new GomokuRPS();
+</script>
+</body>
+</html>
